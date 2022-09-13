@@ -1,37 +1,74 @@
 <script>
 import { useMessageStore } from '@/stores/message.js';
+import * as yup from 'yup';
+
 
 export default {
 
     emits: ['close'],
 
     data(){
-        return{
+
+        const schema = yup.object({
+            name: yup.string().required("name required!"),
+            email: yup.string().required("email is required!").email("provide a valid email!"),
+            phone: yup.number().integer("must be a valid number!").positive("enter a valid phone number!"),
+            message: yup.string().required("message required!")
+
+        });
+
+         return{
             visitorMessage:{
                 name:'',
                 email:'',
                 phone:'',
                 message:''
-            }
-
-
+            },
+           schema,
+           //error object
+           errors:{
+               name:'',
+               email:'',
+               phone:'',
+               message:''
+           }
         }
     },
     
     methods:{
-        submitForm(){
-            const messageStore = useMessageStore();
-            messageStore.sendMessage(this.visitorMessage);
-            this.clearForm();
-            this.closeForm();
+        //submit function with field validation
+        submitForm(obj){
+            this.schema.isValid({
+                name: obj.name,
+                email: obj.email,
+                phone: obj.phone,
+                message: obj.message
+            }).then(function(valid){
+                if(valid){
+                    const messageStore = useMessageStore();
+                messageStore.sendMessage(obj);
+                this.closeAndClearForm();
+                }
+            })
         },
-        clearForm(){
+        //validate each field 
+        validate(field){
+            this.schema.validateAt(field,this.visitorMessage).then(() => (this.errors[field]=""))
+            .catch((err) => {
+                this.errors[err.path] = err.message;
+            });
+
+        },
+        //close and clear form after submitting
+        closeAndClearForm(){
+            this.$emit('close');
             this.visitorMessage = {name:'',email:'',phone:'',message:''}
         },
-        closeForm(){
-            this.$emit('close');
-        }
+        
 
+    },
+    computed:{
+        
     }
 
 }
@@ -39,7 +76,7 @@ export default {
 <template>
 <div class="contact-form-wrap">
     <div class="contact-form">
-        <button class="close" @click="closeForm">
+        <button class="close" @click="closeAndClearForm">
             <img src="src/assets/icons/close.png" :style="{ height:1.2+'rem',width:1.2+'rem'}"/>
         </button>
         <h3>CONTACT FORM</h3>
@@ -51,18 +88,37 @@ export default {
             
         </div>
         <div class="name">
-            <p>Name</p> <input v-model="visitorMessage.name"/>
+            <p>Name</p> 
+            <input v-model="visitorMessage.name" 
+            @blur="validate('name')"
+            @keypress="validate('name')"/>
+            <span v-if="errors.name" class="error">{{ errors.name }}</span>
         </div>
          <div class="email">
-            <p>Email</p> <input type="email" v-model="visitorMessage.email"/>
+            <p>Email</p> 
+            <input type="email"
+             v-model="visitorMessage.email"
+             @blur="validate('email')"
+             @keypress="validate('validate')" />
+             <span v-if="errors.email" class="error">{{ errors.email }}</span>
         </div>
          <div class="phone">
-            <p>Phone</p> <input type="phone" v-model="visitorMessage.phone"/>
+            <p>Phone</p> 
+            <input type="phone" 
+            v-model="visitorMessage.phone"
+            @blur="validate('phone')"
+            @keypress="validate('phone')"
+            />
+            <span v-if="errors.phone" class="error">{{ errors.phone }}</span>
         </div>
          <div class="message">
-            <p>Message</p> <textarea v-model="visitorMessage.message"></textarea>
+            <p>Message</p> 
+            <textarea v-model="visitorMessage.message"
+            @blur="validate('message')"
+            @keypress="validate('message')"></textarea>
+            <span v-if="errors.message" class="error">{{ errors.message }}</span>
         </div>
-        <button class="submit" @click="submitForm">SUBMIT</button>
+        <button class="submit" @click="submitForm(visitorMessage)">SUBMIT</button>
     </div>
 </div>
 
@@ -218,5 +274,12 @@ export default {
     margin-top: 1rem;
     float: right;
     right: 3rem;
+}
+.error{
+    color: red;
+    display: block;
+    margin-left: 6.3rem;
+    line-height: 0rem;
+
 }
 </style>
