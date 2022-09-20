@@ -34,6 +34,10 @@ export default {
       },
       openForm: function(){
         this.isOpen = true;
+      },
+      toServices: function(){
+        const el = document.getElementById('services');
+        el.scrollIntoView({behavior: 'smooth'});
       }
 
     }
@@ -44,7 +48,7 @@ export default {
 <template>
 <header>
   <div class="wrapper">
-     <Header1/>
+     <Header1 @scrollToServices="toServices" @openContactForm="openForm"/>
 
   </div>
 
@@ -53,8 +57,8 @@ export default {
 <body>
   <div class="wrapper">
     <Slide @open = "openForm"/>
-    <Brands/>
-    <Services/>
+    <Brands id="brands"/>
+    <Services id="services"/>
     <Path/>
     <Bottom/>
     <contactForm @close="closeForm" :class="{ 'visible':isOpen }"/>   
@@ -86,7 +90,5 @@ export default {
   margin-left: 3rem;
 }
 
-  
 }
-
 </style>

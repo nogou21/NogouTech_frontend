@@ -184,6 +184,7 @@ export default {
     font-size: medium;
     font-weight: bold;
     color: #717171;
+    cursor: pointer;
 }
 .career-box {
     height: auto;
@@ -200,6 +201,7 @@ export default {
     font-size: medium;
     font-weight: bold;
     color: #717171;
+    cursor: pointer;
 }
 .last-box {
     width: inherit;

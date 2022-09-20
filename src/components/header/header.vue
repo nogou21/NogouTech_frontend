@@ -1,6 +1,6 @@
 <script>
 export default {
-    emits:['open'],
+    emits:['open','scrollToServices','openContactForm'],
     data(){
         return{
            visible: false,
@@ -55,7 +55,7 @@ export default {
 
     </div>
     <div class="contact-container" :class="{'see-menu':open}">
-        <div class="contact-button">
+        <div class="contact-button" @click="$emit('openContactForm')">
             <small>Contact us</small>
             <img src="src/assets/icons/phone-call.png" class="phone-icon"/>
 
@@ -64,8 +64,7 @@ export default {
     </div>
     <div class="menu-content" :class="{ 'menu-visible':visible }" v-on:mouseleave="mouseleave">
         <ul :style="{ 'margin-top': margin_top + 'rem'}">
-            <li>services</li>
-            <li>team</li>
+            <li @click="$emit('scrollToServices')">services</li>
             <li>SEO</li>
             <li>design</li>
             <li>communication</li>
